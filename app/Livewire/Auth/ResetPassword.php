@@ -1,5 +1,5 @@
 <?php
-// app/Livewire/Auth/VerifyOtp.php
+// app/Livewire/Auth/ResetPassword.php
 
 namespace App\Livewire\Auth;
 
@@ -7,57 +7,58 @@ use App\Enums\OtpPurpose;
 use App\Enums\OtpVerificationResult;
 use App\Services\Auth\AuthServiceContract;
 use App\Services\OtpService;
+use Livewire\Attributes\Rule;
 use Livewire\Component;
 
-class VerifyOtp extends Component
+class ResetPassword extends Component
 {
     public string $code = '';
 
-    // A single message slot instead of separate error/status strings —
-    // only one message is ever visible at a time.
+    #[Rule('required|min:8|confirmed')]
+    public string $password = '';
+
+    public string $password_confirmation = '';
+
     public string $message = '';
-    public string $messageType = ''; // 'error' | 'success'
-    public bool $verified = false; // temporary: Chapter 2 has no Login page yet
+    public string $messageType = '';
 
     public ?int $expiresAt = null;
     public int $resendAvailableIn = 0;
 
     public function mount(OtpService $otpService)
     {
-        $email = session('otp_email');
+        $email = session('reset_email');
 
         if (! $email) {
-            return redirect()->route('register');
+            return redirect()->route('forgot-password');
         }
 
         $this->refreshTimers($otpService, $email);
     }
 
-    public function verify(AuthServiceContract $authService, OtpService $otpService)
+    public function resetPassword(AuthServiceContract $authService, OtpService $otpService)
     {
-        $email = session('otp_email');
+        $email = session('reset_email');
 
         if (! $email) {
-            return redirect()->route('register');
+            return redirect()->route('forgot-password');
         }
 
-        $result = $authService->verifyRegistration($email, $this->code);
+        $this->validate();
+
+        $result = $authService->resetPassword($email, $this->code, $this->password);
 
         if ($result === OtpVerificationResult::Success) {
-            session()->forget('otp_email');
+            session()->forget('reset_email');
 
-            
-            return redirect()->route('login')->with('status', 'Email verified! You can now login.');
-            
+            return redirect()->route('login')->with('status', 'Password reset! You can now log in.');
         }
 
         $this->setMessage(match ($result) {
             OtpVerificationResult::InvalidCode => 'That code is incorrect. Please try again.',
             OtpVerificationResult::TooManyAttempts => 'Too many incorrect attempts. Request a new code below.',
             OtpVerificationResult::NotFound => 'We couldn\'t find a pending code. Request a new one below.',
-            // No message for Expired — the countdown line already says
-            // "This code has expired," so a second message would be redundant.
-            OtpVerificationResult::Expired => '',
+            OtpVerificationResult::Expired => '', // countdown line already communicates this
         }, type: 'error');
 
         $this->refreshTimers($otpService, $email);
@@ -65,13 +66,13 @@ class VerifyOtp extends Component
 
     public function resend(AuthServiceContract $authService, OtpService $otpService)
     {
-        $email = session('otp_email');
+        $email = session('reset_email');
 
         if (! $email) {
-            return redirect()->route('register');
+            return redirect()->route('forgot-password');
         }
 
-        $sent = $authService->resendRegistrationOtp($email);
+        $sent = $authService->resendPasswordResetOtp($email);
 
         $this->setMessage(
             $sent ? 'A new code has been sent to your email.' : 'Please wait before requesting another code.',
@@ -90,14 +91,14 @@ class VerifyOtp extends Component
 
     protected function refreshTimers(OtpService $otpService, string $email): void
     {
-        $otp = $otpService->latest($email, OtpPurpose::Registration);
+        $otp = $otpService->latest($email, OtpPurpose::PasswordReset);
 
         $this->expiresAt = $otp?->expires_at?->timestamp;
-        $this->resendAvailableIn = $otpService->secondsUntilResend($email, OtpPurpose::Registration);
+        $this->resendAvailableIn = $otpService->secondsUntilResend($email, OtpPurpose::PasswordReset);
     }
 
     public function render()
     {
-        return view('livewire.auth.verify-otp');
+        return view('livewire.auth.reset-password');
     }
 }
