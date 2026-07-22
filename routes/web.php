@@ -14,6 +14,7 @@ use App\Livewire\Auth\ResetPassword;
 
 use App\Livewire\Newsfeed;
 
+use App\Livewire\Profile\EditProfile;
 
 Route::middleware('guest')->group(function () {
     
@@ -28,6 +29,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/newsfeed', Newsfeed::class)->name('newsfeed');
+    Route::get('/profile/edit', EditProfile::class)->name('profile.edit');
 });
 
 
