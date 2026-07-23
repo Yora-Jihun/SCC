@@ -13,12 +13,12 @@ class LikeButton extends Component
     public int $count = 0;
     public bool $liked = false;
 
-    public function mount(Post $post, int $count = 0, bool $liked = false): void
-    {
-        $this->post = $post;
-        $this->count = $count;
-        $this->liked = $liked;
-    }
+  public function mount(Post $post): void
+{
+    $this->post = $post;
+    $this->count = $post->likes()->count();
+    $this->liked = $post->likes()->where('user_id', auth()->id())->exists();
+}
 
     public function toggle(LikeService $likeService): void
     {
