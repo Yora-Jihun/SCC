@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Storage;
 
+use App\Concerns\Followable;
+
 /**
  * @property int $id
  * @property string $name
@@ -37,6 +39,8 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+
+    use Followable;
     protected function casts(): array
     {
         return [

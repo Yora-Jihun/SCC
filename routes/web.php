@@ -16,6 +16,8 @@ use App\Livewire\Newsfeed;
 
 use App\Livewire\Profile\EditProfile;
 
+use App\Livewire\Profile\ShowProfile;
+
 Route::middleware('guest')->group(function () {
     
     Route::get('/', function (){return view('welcome');})->name('welcome');
@@ -30,6 +32,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/newsfeed', Newsfeed::class)->name('newsfeed');
     Route::get('/profile/edit', EditProfile::class)->name('profile.edit');
+    Route::get('/profile/{user}', ShowProfile::class)->name('profile.show');
+
 });
 
 Route::post('/logout', function (Request $request) {

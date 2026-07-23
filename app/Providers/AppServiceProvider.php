@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
+use App\Events\UserFollowed;
+use App\Listeners\SendFriendshipNotification;
+use Illuminate\Support\Facades\Event;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+    
+        Event::listen(UserFollowed::class, SendFriendshipNotification::class);
         $this->configureDefaults();
     }
 
