@@ -31,4 +31,11 @@ class PostPolicy
         // followers even though the owner marked it private.
         return $post->visibility === PostVisibility::Public && $post->user_id !== $user->id;
     }
+
+
+    public function like(User $user, Post $post): bool
+    {
+        // Liking requires the same visibility rule as viewing.
+        return $this->view($user, $post);
+    }
 }

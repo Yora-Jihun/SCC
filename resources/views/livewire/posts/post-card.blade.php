@@ -28,6 +28,10 @@
                 @if ($post->originalPost)
                     <p class="text-sm font-semibold">{{ $post->originalPost->author->name }}</p>
                     <p class="text-sm text-gray-700">{{ $post->originalPost->body }}</p>
+                    @if ($post->originalPost->image_path)
+                        <img src="{{ Storage::disk('public')->url($post->originalPost->image_path) }}"
+                             class="rounded w-full mt-2">
+                    @endif
                 @else
                     <p class="text-sm text-gray-400 italic">This post is no longer available.</p>
                 @endif
@@ -35,6 +39,12 @@
         @endif
 
         <div class="flex gap-3 text-sm text-gray-500 pt-2">
+                  <livewire:likes.like-button
+            :post="$post"
+            :count="$post->likes_count"
+            :liked="$post->liked_by_viewer"
+            :key="'like-'.$post->id"
+        />
             @can('update', $post)
                 <button wire:click="startEditing">Edit</button>
             @endcan

@@ -17,7 +17,7 @@
         @empty
             <p class="text-center text-gray-500">No posts yet — be the first to share something!</p>
         @endforelse
-
+ 
         <div class="max-w-xl mx-auto">
             {{ $posts->links() }}
         </div>

@@ -17,10 +17,16 @@ class FeedQuery
             ->paginate($perPage);
     }
 
+   // app/Queries/FeedQuery.php — replace the existing baseQuery() method
+
     protected function baseQuery(User $viewer): Builder
     {
         return \App\Models\Post::query()
             ->with(['author', 'originalPost.author'])
+            ->withCount('likes')
+            ->withExists(['likes as liked_by_viewer' => function (Builder $query) use ($viewer) {
+                $query->where('user_id', $viewer->id);
+            }])
             ->where(function (Builder $query) use ($viewer) {
                 $query->where('visibility', PostVisibility::Public)
                     ->orWhere('user_id', $viewer->id);

@@ -1,4 +1,5 @@
 <?php
+// app/Livewire/Posts/PostCard.php
 
 namespace App\Livewire\Posts;
 
@@ -57,14 +58,13 @@ class PostCard extends Component
         $this->authorize('update', $this->post);
         $this->validate();
 
-        $postService->updatePost($this->post, new UpdatePostData(
+        $this->post = $postService->updatePost($this->post, new UpdatePostData(
             body: $this->body,
             visibility: PostVisibility::from($this->visibility),
             image: $this->image,
             removeImage: $this->removeImage,
         ));
 
-        $this->post->refresh();
         $this->editing = false;
         $this->reset(['image', 'removeImage']);
     }

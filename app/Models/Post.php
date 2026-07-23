@@ -8,8 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Concerns\HasLikes;
+
 class Post extends Model
 {
+         use HasLikes;
+    // ...everything else from Chapter 5 stays exactly as it was
+
     protected $fillable = ['user_id', 'shared_post_id', 'body', 'image_path', 'visibility'];
 
     protected $casts = [
@@ -35,4 +40,5 @@ class Post extends Model
     {
         return $this->shared_post_id !== null;
     }
+
 }
