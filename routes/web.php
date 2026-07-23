@@ -32,8 +32,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', EditProfile::class)->name('profile.edit');
 });
 
-
-
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
